@@ -1,34 +1,38 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
+import Homepage from './pages/Homepage'
+
+//admin page
+import AdminLogIn from './pages/admin page/AdminLogIn';
+import Admin from './pages/admin page/Adminpage';
+import AdminItemlist from './pages/admin page/AdminItemlist';
+import AdminDebtlist from './pages/admin page/AdminDebtlist';
+
+//client page
+import Clientpage from './pages/client page/Clientpage';
+import ClientDebtlist from './pages/client page/ClientDebtlist';
+import ClientItemlist from './pages/client page/ClientItemlist';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Homepage />}/>
+
+        {/* admin side */}
+        <Route path="/admin/login" element={<AdminLogIn />}/>
+        <Route path='/admin' element={<Admin />}/>
+        <Route path='/admin/item-list' element={<AdminItemlist />}/>
+        <Route path='/admin/debt-list' element={<AdminDebtlist />}/>
+
+        {/* client side */}
+        <Route path='/client' element={<Clientpage />}/>
+        <Route path='/client/item-list' element={<ClientItemlist />}/>
+        <Route path='/client/debt-list' element={<ClientDebtlist />}/>
+
+      </Routes>
+    </Router>
   )
 }
 
