@@ -7,6 +7,7 @@ function AdminDebtlist() {
   const [item, setItem] = React.useState('');
   const [price, setPrice] = React.useState('');
   const [groupItems, setGroupItems] = React.useState({});
+  const [message, setMessage] = React.useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -35,7 +36,25 @@ function AdminDebtlist() {
     setCategory('');
     setItem('');
     setPrice('');
-  }
+  };
+
+  const handleClearDebt = (name) => {
+    const clearConfirmation = window.confirm("Are you sure to clear the debt?");
+
+    if (!clearConfirmation) return;
+
+    setGroupItems(prev => {
+      const updatedGroupItems = {...prev};
+      delete updatedGroupItems[name];
+      return updatedGroupItems;
+    });
+
+      setMessage(`Successfully Cleared ${name} Debt! ✅`);
+
+    setTimeout(() => {
+      setMessage('')
+     }, 2000);
+  };
 
   return (
     <>
@@ -71,16 +90,26 @@ function AdminDebtlist() {
               onChange={(e) => setPrice(e.target.value)}
             />
 
-            <button type='submit'>Add</button>
-            <button>Update</button>
+            {/* BUTTONS */}
+            <button type='submit'>Add</button> 
           </form>
         </div>
 
         <div className='border m-auto w-[50%]'>
           <h1>Debt</h1>
+          {message}
           {Object.entries(groupItems).map(([name, category]) => (
+            
             <div key={name} className='flex flex-col justify-center'>
-              <h2 className='font-extrabold'>{name}</h2>
+                <h2 className='font-extrabold'>{name}</h2>
+                {/* deletion of utang*/}
+                <button 
+                  onClick={() => handleClearDebt(name)}
+                  className='inline-block'
+                  >
+                  Clear Debt
+                </button>
+
               {Object.entries(category).map(([category, item]) => (
                 <div key={category}>
                   <h3>{category}</h3>
