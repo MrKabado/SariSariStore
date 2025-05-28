@@ -23,6 +23,7 @@ function AdminItemlists() {
     setPrice('')
 
   } 
+
   return (
     <>
     <div>
@@ -38,12 +39,14 @@ function AdminItemlists() {
 
             <input 
               type="text" 
+              placeholder='Item Name'
               value={item}
               onChange={(e) => setItem(e.target.value)}            
             />
 
             <input 
               type="number" 
+              placeholder='Price'
               value={price}
               onChange={(e) => setPrice(e.target.value)}
             />
