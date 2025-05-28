@@ -6,7 +6,7 @@ import Homepage from './pages/Homepage'
 //admin page
 import AdminLogIn from './pages/admin page/AdminLogIn';
 import Admin from './pages/admin page/Adminpage';
-import AdminItemlist from './pages/admin page/AdminItemlist';
+import AdminItemlists from './pages/admin page/AdminItemlists';
 import AdminDebtlist from './pages/admin page/AdminDebtlist';
 
 //client page
@@ -23,7 +23,7 @@ function App() {
         {/* admin side */}
         <Route path="/admin/login" element={<AdminLogIn />}/>
         <Route path='/admin' element={<Admin />}/>
-        <Route path='/admin/item-list' element={<AdminItemlist />}/>
+        <Route path='/admin/item-list' element={<AdminItemlists />}/>
         <Route path='/admin/debt-list' element={<AdminDebtlist />}/>
 
         {/* client side */}
