@@ -1,16 +1,83 @@
 import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import dotenv from 'dotenv';
+dotenv.config();
+
 const app = express();
-
-app.use('/api/testing', (req, res) => {
-    res.send('tanga');
-})
-
-
+app.use(cors());
 app.use(express.json())
 
-app.listen(8080, () => {
-    console.log('Server running at http://localhost:8080');
-})
+const PORT = process.env.PORT || 8080
+
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('MongoDB Connected'))
+    .catch(err => console.error(err));
+
+const ItemSchema = new mongoose.Schema({
+    category: String,
+    name: String,
+    price: Number,
+});
+
+const Item = mongoose.model('Item', ItemSchema);
+
+app.get('/items', async (req, res) => {
+    try {
+        const items = await Item.find();
+        res.json(items);
+    }   catch (err) { 
+        res.status(500).json({message: 'Server Error'});
+    }
+});
+
+app.post('/items', async (req, res) => {
+    const {category, name, price} = req.body;
+
+    try {
+        const newItem = new Item({category, name, price});
+        await newItem.save();
+        res.status(201).json(newItem);
+    } catch (err) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+app.put('/items/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name, price } = req.body;
+
+    try {
+        const updatedItems = await Item.findByIdAndUpdate(
+            id,
+            { name, price },
+            { new: true }
+        );
+        res.json(updatedItems);
+    } catch (err) {
+        res.status(500).json({ message: 'Update Error' });
+    }
+});
+
+app.delete('/items/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await Item.findByIdAndDelete(id);
+        res.json({ message: 'Item deleted'});
+    } catch {
+        res.status(500).json({ message: 'Delete Error' });
+    }
+});
+
+
+app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+});
+
+
+
+
 
 // MVC architecture
 // reasearch about cors
@@ -18,3 +85,9 @@ app.listen(8080, () => {
 // validation using joi or any basic validation
 // zod sa frontend para connecrt or global state management
 //dami toll!!!
+
+//user: admin
+//pass: admin11182004
+
+//connection string
+//mongodb+srv://admin:admin11182004@cluster0.sptvadg.mongodb.net/products?retryWrites=true&w=majority&appName=Cluster0

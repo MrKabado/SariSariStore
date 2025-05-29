@@ -1,145 +1,221 @@
-import React from 'react'
-import Button from '../../components/Button'
+import React, { useEffect, useState } from 'react';
+import Button from '../../components/Button';
 
 function AdminItemlists() {
-  const [category, setCategory] = React.useState('');
-  const [item, setItem] = React.useState('');
-  const [price, setPrice] = React.useState('');
-  const [groupItems, setGroupItems] = React.useState({});
-  const [selectedIndex, setSelectedIndex] = React.useState(null);
-  const [message, setMessage] = React.useState('')
+  const [category, setCategory] = useState('');
+  const [item, setItem] = useState('');
+  const [price, setPrice] = useState('');
+  const [groupItems, setGroupItems] = useState({});
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [selectedItemId, setSelectedItemId] = useState(null); // to track _id from DB
+  const [message, setMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  // Fetch items on mount
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  async function fetchItems() {
+    try {
+      const res = await fetch('http://localhost:8080/items');
+      const data = await res.json();
+
+      // Group items by category
+      const grouped = {};
+      data.forEach(i => {
+        if (!grouped[i.category]) grouped[i.category] = [];
+        grouped[i.category].push(i); // keep whole object including _id
+      });
+      setGroupItems(grouped);
+    } catch (error) {
+      console.error('Error fetching items:', error);
+    }
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!category || !item || !price) return;
 
-    const newItem = { name: item, price: parseFloat(price) };
+    try {
+      const res = await fetch('http://localhost:8080/items', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category, name: item, price: parseFloat(price) }),
+      });
 
-    setGroupItems(prev => ({
-      ...prev,
-      [category]: [...(prev[category] || []), newItem]
-    }));
+      if (!res.ok) throw new Error('Failed to add item');
 
-    setItem('');
-    setPrice('');
-    setSelectedIndex(null);
-  };
+      const savedItem = await res.json();
 
-  const handleUpdate = (e) => {
-    e.preventDefault();
-    if (selectedIndex === null || !category || !item || !price) return;
-
-    setGroupItems(prev => {
-      const updatedItems = [...(prev[category] || [])];
-      updatedItems[selectedIndex] = {
-        name: item,
-        price: parseFloat(price),
-      };
-
-      return {
+      setGroupItems(prev => ({
         ...prev,
-        [category]: updatedItems,
-      };
-    });
+        [category]: [...(prev[category] || []), savedItem],
+      }));
 
-    setItem('');
-    setPrice('');
-    setSelectedIndex(null);
-  };
-
-  const handleDelete = (indexToDelete) => {
-    const deleteConfirmation = window.confirm('are you sure to delete the list?');
-
-    if (!deleteConfirmation) return;
-
-    setGroupItems(prev => {
-      const updatedItems = [...(prev[category] || [])];
-      updatedItems.splice(indexToDelete, 1);
-
-      return {
-        ...prev,
-        [category]: updatedItems,
-      }
-    });
-
-    if (selectedIndex === indexToDelete) {
       setItem('');
       setPrice('');
       setSelectedIndex(null);
+      setSelectedItemId(null);
+      setMessage('Item added successfully!');
+      setTimeout(() => setMessage(''), 2000);
+    } catch (error) {
+      console.error(error);
+      setMessage('Failed to add item');
     }
+  };
 
-    setMessage('deleted successfully! ✅');
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    if (selectedIndex === null || !category || !item || !price || !selectedItemId) return;
 
-    setTimeout(() => {
-      setMessage('')
-    }, 2000);
+    try {
+      const res = await fetch(`http://localhost:8080/items/${selectedItemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: item, price: parseFloat(price) }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update item');
+
+      const updatedItem = await res.json();
+
+      setGroupItems(prev => {
+        const updatedItems = [...(prev[category] || [])];
+        updatedItems[selectedIndex] = updatedItem;
+        return {
+          ...prev,
+          [category]: updatedItems,
+        };
+      });
+
+      setItem('');
+      setPrice('');
+      setSelectedIndex(null);
+      setSelectedItemId(null);
+      setMessage('Item updated successfully!');
+      setTimeout(() => setMessage(''), 2000);
+    } catch (error) {
+      console.error(error);
+      setMessage('Failed to update item');
+    }
+  };
+
+  const handleDelete = async (indexToDelete) => {
+    const deleteConfirmation = window.confirm('Are you sure to delete the item?');
+    if (!deleteConfirmation) return;
+
+    const itemToDelete = groupItems[category][indexToDelete];
+    if (!itemToDelete?._id) return;
+
+    try {
+      const res = await fetch(`http://localhost:8080/items/${itemToDelete._id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error('Failed to delete item');
+
+      setGroupItems(prev => {
+        const updatedItems = [...(prev[category] || [])];
+        updatedItems.splice(indexToDelete, 1);
+        return {
+          ...prev,
+          [category]: updatedItems,
+        };
+      });
+
+      if (selectedIndex === indexToDelete) {
+        setItem('');
+        setPrice('');
+        setSelectedIndex(null);
+        setSelectedItemId(null);
+      }
+
+      setMessage('Item deleted successfully!');
+      setTimeout(() => setMessage(''), 2000);
+    } catch (error) {
+      console.error(error);
+      setMessage('Failed to delete item');
+    }
   };
 
   return (
-    <div className='border m-0'>
-      <header className='border p-2 sticky'>
-        <div className='AddItem'>
+    <div className="border m-0">
+      <header className="border p-2 sticky">
+        <div className="AddItem">
           <form onSubmit={handleSubmit}>
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option value="" disabled>Select</option>
+            <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+              <option value="" disabled>
+                Select
+              </option>
               <option value="Soap">Soap</option>
               <option value="Shampoo">Shampoo</option>
             </select>
 
             <input
               type="text"
-              placeholder='Item Name'
-              value={item ?? ''}
+              placeholder="Item Name"
+              required
+              value={item}
               onChange={(e) => setItem(e.target.value)}
             />
 
             <input
               type="number"
-              placeholder='Price'
-              value={price ?? ''}
+              placeholder="Price"
+              required
+              value={price}
               onChange={(e) => setPrice(e.target.value)}
             />
 
-            <button type='submit'>Add</button>
-            <button type='button' onClick={handleUpdate}>Update</button>
+            <button type="submit">Add</button>
+            <button type="button" onClick={handleUpdate} disabled={selectedIndex === null}>
+              Update
+            </button>
           </form>
-        </div><br />
+        </div>
+        <br />
         <p>{message}</p>
-
       </header>
 
-      <div className='border m-auto w-[50%]'>
+      <div className="border m-auto w-[50%]">
         <h2>Items</h2>
-        {Object.entries(groupItems).map(([category, items]) => (
-          <div key={category} className='flex flex-col justify-center'>
-            <h3 className='font-extrabold'>{category}</h3>
+        {Object.entries(groupItems).map(([categoryName, items]) => (
+          <div key={categoryName} className="flex flex-col justify-center">
+            <h3 className="font-extrabold">{categoryName}</h3>
             <table>
               <thead>
                 <tr>
                   <th>Item Name</th>
                   <th>Price</th>
+                  <th>Delete</th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((itemObj, index) => (
-                  <tr 
-                    key={index} 
+                  <tr
+                    key={itemObj._id}
                     onClick={() => {
-                    setItem(itemObj.name ?? '');
-                    setPrice(itemObj.price ?? '');
-                    setSelectedIndex(index);
-                  }}
-                    className='hover:cursor-pointer'
+                      setCategory(categoryName);
+                      setItem(itemObj.name);
+                      setPrice(itemObj.price);
+                      setSelectedIndex(index);
+                      setSelectedItemId(itemObj._id);
+                    }}
+                    className="hover:cursor-pointer"
                   >
                     <td>{itemObj.name}</td>
                     <td>₱{itemObj.price.toFixed(2)}</td>
-                    <td className='w-5'>
-                      <button 
-                        className='hover:cursor-pointer'
+                    <td className="w-5">
+                      <button
+                        className="hover:cursor-pointer"
                         onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(index);
-                    }}>❌</button></td>
+                          e.stopPropagation();
+                          handleDelete(index);
+                        }}
+                      >
+                        ❌
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -148,7 +224,7 @@ function AdminItemlists() {
         ))}
       </div>
 
-      <Button to='/admin' label='Return To Admin Page' />
+      <Button to="/admin" label="Return To Admin Page" />
     </div>
   );
 }
