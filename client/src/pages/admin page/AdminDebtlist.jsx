@@ -59,41 +59,42 @@ function AdminDebtlist() {
   return (
     <>
     <div>
-        debt list
-        <div className='AddDebt'>
-          <form onSubmit={handleSubmit}>
-            {/* For Ngalan */}
-            <select name="name" id="" value={name} onChange={(e) => setName(e.target.value)}>
-              <option value="" disabled>Select Person</option>
-              <option value="Jers">Jers</option>
-              <option value="Maricar">Maricar</option>
-            </select>
-            
-            {/* For Item Category */}
-            <select name="category" id="" value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option value="" disabled>Select Item</option>
-              <option value="Soap">Soap</option>
-              <option value="Shampoo">Shampoo</option>
-            </select>
+        <header className='border p-2'>
+          <div className='AddDebt'>
+            <form onSubmit={handleSubmit}>
+              {/* For Ngalan */}
+              <select name="name" id="" value={name} onChange={(e) => setName(e.target.value)}>
+                <option value="" disabled>Select Person</option>
+                <option value="Jers">Jers</option>
+                <option value="Maricar">Maricar</option>
+              </select>
+              
+              {/* For Item Category */}
+              <select name="category" id="" value={category} onChange={(e) => setCategory(e.target.value)}>
+                <option value="" disabled>Select Item</option>
+                <option value="Soap">Soap</option>
+                <option value="Shampoo">Shampoo</option>
+              </select>
 
-            {/* For Item */}
-            <input 
-              type="text" 
-              value={item}
-              onChange={(e) => setItem(e.target.value)}
-            />
-            
-            {/* For Price */}
-            <input 
-              type="number" 
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-            />
+              {/* For Item */}
+              <input 
+                type="text" 
+                value={item}
+                onChange={(e) => setItem(e.target.value)}
+              />
+              
+              {/* For Price */}
+              <input 
+                type="number" 
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
 
-            {/* BUTTONS */}
-            <button type='submit'>Add</button> 
-          </form>
-        </div>
+              {/* BUTTONS */}
+              <button type='submit'>Add</button> 
+            </form>
+          </div>
+        </header>
 
         <div className='border m-auto w-[50%]'>
           <h1>Debt</h1>
