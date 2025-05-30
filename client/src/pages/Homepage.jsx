@@ -4,7 +4,7 @@ import Button from "../components/Button";
 function Homepage() {
   return(
       <div>       
-        <h1>WELCOME TO JENNY SARI-SARI STORE</h1>
+        <h1 className="font-">WELCOME TO JENNY SARI-SARI STORE</h1>
         <Button 
           to='/client' 
           label='Proceed as Customer'
