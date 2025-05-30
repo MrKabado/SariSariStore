@@ -1,148 +1,187 @@
-import React from 'react'
-import Button from '../../components/Button'
+import React, { useEffect, useState } from 'react';
+import Button from '../../components/Button';
 
 function AdminDebtlist() {
-  const [name, setName] = React.useState('');
-  const [category, setCategory] = React.useState('');
-  const [item, setItem] = React.useState('');
-  const [price, setPrice] = React.useState('');
-  const [groupItems, setGroupItems] = React.useState({});
-  const [message, setMessage] = React.useState('');
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState('');
+  const [item, setItem] = useState('');
+  const [price, setPrice] = useState('');
+  const [groupItems, setGroupItems] = useState({});
+  const [message, setMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  async function fetchItems() {
+    try {
+      const res = await fetch('http://localhost:8080/debts');
+      const data = await res.json();
+
+      const grouped = {};
+      data.forEach(i => {
+        if (!grouped[i.name]) grouped[i.name] = {};
+        if (!grouped[i.name][i.category]) grouped[i.name][i.category] = [];
+        grouped[i.name][i.category].push(i);
+      });
+      setGroupItems(grouped);
+    } catch (error) {
+      console.error('Error fetching items:', error);
+    }
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(name, category, item, price);
 
     if (!name || !category || !item || !price) return;
 
-    const newItem = {
+    const newDebt = {
+      name,
+      category,
       item,
-      price:parseFloat(price)
-    }
+      price: parseFloat(price),
+    };
 
-    // create structure for person who debts
-    setGroupItems(prev => ({ 
-      ...prev,
-      [name]: {
-        ...(prev[name] || {}), //check if naay existing name
+    try {
+      const res = await fetch('http://localhost:8080/debts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newDebt),
+      });
+
+      if (!res.ok) throw new Error('Failed to add item');
+
+      const savedDebt = await res.json();
+
+      setGroupItems(prev => ({
+        ...prev,
+        [name]: {
+          ...(prev[name] || {}),
           [category]: [
-            ...(prev[name]?.[category] || []), //if naay existing nga category if yes e add ra
-            newItem //if naa e dungag ang bagong item
-          ]
-      },
-    }));
+            ...(prev[name]?.[category] || []),
+            savedDebt
+          ],
+        },
+      }));
 
-    setName('');
-    setCategory('');
-    setItem('');
-    setPrice('');
+      setMessage(`Debt added successfully for ${name}! ✅`);
+      setTimeout(() => setMessage(''), 2000);
+
+      setName('');
+      setCategory('');
+      setItem('');
+      setPrice('');
+    } catch (error) {
+      console.error('Error submitting debt:', error);
+    }
   };
 
-  const handleClearDebt = (name) => {
+  const handleClearDebt = async (name) => {
     const clearConfirmation = window.confirm("Are you sure to clear the debt?");
-
     if (!clearConfirmation) return;
 
-    setGroupItems(prev => {
-      const updatedGroupItems = {...prev};
-      delete updatedGroupItems[name];
-      return updatedGroupItems;
-    });
+    try {
+      const res = await fetch(`http://localhost:8080/debts/name/${name}`, { 
+        method: 'DELETE',
+       });
+      
+      if (!res.ok) throw new Error('Failed to delete debts');
+      
+      setGroupItems(prev => {
+        const updated = { ...prev };
+        delete updated[name];
+        return updated;
+      });
 
       setMessage(`Successfully Cleared ${name} Debt! ✅`);
-
-    setTimeout(() => {
-      setMessage('')
-     }, 2000);
+      setTimeout(() => setMessage(''), 2000);
+    } catch (error) {
+      console.error('Error clearing debt:', error);
+      setMessage('Failed to clear debt');
+      setTimeout(() => setMessage(''), 2000);
+    }
   };
 
   return (
-    <>
     <div>
-        <header className='border p-2'>
-          <div className='AddDebt'>
-            <form onSubmit={handleSubmit}>
-              {/* For Ngalan */}
-              <select name="name" id="" value={name} onChange={(e) => setName(e.target.value)}>
-                <option value="" disabled>Select Person</option>
-                <option value="Jers">Jers</option>
-                <option value="Maricar">Maricar</option>
-              </select>
-              
-              {/* For Item Category */}
-              <select name="category" id="" value={category} onChange={(e) => setCategory(e.target.value)}>
-                <option value="" disabled>Select Item</option>
-                <option value="Soap">Soap</option>
-                <option value="Shampoo">Shampoo</option>
-              </select>
+      <header className='border p-2'>
+        <div className='AddDebt'>
+          <form onSubmit={handleSubmit}>
+            {/* Person Name */}
+            <select value={name} onChange={(e) => setName(e.target.value)}>
+              <option value="" disabled>Select Person</option>
+              <option value="Jers">Jers</option>
+              <option value="Maricar">Maricar</option>
+            </select>
 
-              {/* For Item */}
-              <input 
-                type="text" 
-                value={item}
-                onChange={(e) => setItem(e.target.value)}
-              />
-              
-              {/* For Price */}
-              <input 
-                type="number" 
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
+            {/* Item Category */}
+            <select value={category} onChange={(e) => setCategory(e.target.value)}>
+              <option value="" disabled>Select Item</option>
+              <option value="Soap">Soap</option>
+              <option value="Shampoo">Shampoo</option>
+            </select>
 
-              {/* BUTTONS */}
-              <button type='submit'>Add</button> 
-            </form>
-          </div>
-        </header>
+            {/* Item Name */}
+            <input 
+              type="text" 
+              placeholder="Item" 
+              value={item}
+              onChange={(e) => setItem(e.target.value)} 
+            />
 
-        <div className='border m-auto w-[50%]'>
-          <h1>Debt</h1>
-          {message}
-          {Object.entries(groupItems).map(([name, category]) => (
-            
-            <div key={name} className='flex flex-col justify-center'>
-                <h2 className='font-extrabold'>{name}</h2>
-                {/* deletion of utang*/}
-                <button 
-                  onClick={() => handleClearDebt(name)}
-                  className='inline-block'
-                  >
-                  Clear Debt
-                </button>
+            {/* Price */}
+            <input 
+              type="number" 
+              placeholder="Price" 
+              value={price}
+              onChange={(e) => setPrice(e.target.value)} 
+            />
 
-              {Object.entries(category).map(([category, item]) => (
-                <div key={category}>
-                  <h3>{category}</h3>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Item</th>
-                        <th>Price</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {item.map((itemObj, index) => (
-                        <tr key={index}>
-                          <td>{itemObj.item}</td>
-                          <td>{itemObj.price.toFixed(2)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ))}
-            </div>
-                  ))}
+            {/* Add Button */}
+            <button type='submit'>Add</button>
+          </form>
         </div>
-        
-        <Button 
-          to='/admin'  
-          label='Return To Admin Page'      
-        />
+      </header>
+
+      <div className='border m-auto w-[50%]'>
+        <h1>Debt</h1>
+        <div>{message}</div>
+        {Object.entries(groupItems).map(([name, categories]) => (
+          <div key={name} className='flex flex-col justify-center'>
+            <h2 className='font-extrabold'>{name}</h2>
+
+            <button onClick={() => handleClearDebt(name)} className='inline-block'>
+              Clear Debt
+            </button>
+
+            {Object.entries(categories).map(([categoryName, items]) => (
+              <div key={categoryName}>
+                <h3>{categoryName}</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th>Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((itemObj, index) => (
+                      <tr key={index}>
+                        <td>{itemObj.item}</td>
+                        <td>{itemObj.price.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <Button to='/admin' label='Return To Admin Page' />
     </div>
-    </>
-  )
+  );
 }
 
-export default AdminDebtlist
+export default AdminDebtlist;

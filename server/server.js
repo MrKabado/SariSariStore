@@ -20,8 +20,18 @@ const ItemSchema = new mongoose.Schema({
     price: Number,
 });
 
-const Item = mongoose.model('Item', ItemSchema);
+const DebtSchema = new mongoose.Schema({
+    name: String,
+    category: String,
+    item: String,
+    price: Number,
+})
 
+const Item = mongoose.model('Item', ItemSchema);
+const Debt = mongoose.model('Debt', DebtSchema);
+
+
+//GET
 app.get('/items', async (req, res) => {
     try {
         const items = await Item.find();
@@ -31,6 +41,17 @@ app.get('/items', async (req, res) => {
     }
 });
 
+app.get('/debts', async (req, res) => {
+    try {
+        const debts = await Debt.find();
+        res.json(debts);
+    } catch (err) {
+        res.status(500).json({message: 'Server Error'});
+    }
+})
+
+
+//POST
 app.post('/items', async (req, res) => {
     const {category, name, price} = req.body;
 
@@ -43,6 +64,20 @@ app.post('/items', async (req, res) => {
     }
 });
 
+app.post('/debts', async (req, res) => {
+    const {name, category, item, price} = req.body;
+
+    try {
+        const newDebt = new Debt({name, category, item, price});
+        await newDebt.save();
+        res.status(201).json(newDebt);
+    } catch (err) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+})
+
+
+//PUT
 app.put('/items/:id', async (req, res) => {
     const { id } = req.params;
     const { name, price } = req.body;
@@ -59,12 +94,41 @@ app.put('/items/:id', async (req, res) => {
     }
 });
 
+app.put('/debts/:id', async (req, res) => {
+    const {id} = req.params;
+    const { category, item, price } = req.body;
+
+    try {
+        const updatedDebts = await Debt.findByIdAndUpdate(
+            id,
+            { category, item, price },
+            { new: true }
+        );
+        res.json(updatedDebts);
+    } catch (err) {
+        res.status(500).json({ message: 'Update Error' });
+    }
+});
+
+
+//DELETE
 app.delete('/items/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
         await Item.findByIdAndDelete(id);
         res.json({ message: 'Item deleted'});
+    } catch {
+        res.status(500).json({ message: 'Delete Error' });
+    }
+});
+
+app.delete('/debts/name/:name', async (req, res) => {
+    const { name } = req.params;
+
+    try {
+        await Debt.deleteMany({ name });
+        res.json({ message: `${name} Debt Deleted`});
     } catch {
         res.status(500).json({ message: 'Delete Error' });
     }
