@@ -15,7 +15,7 @@ function AdminDebtlist() {
 
   async function fetchItems() {
     try {
-      const res = await fetch('http://localhost:8080/debts');
+      const res = await fetch('http://192.168.0.112:8080/debts');
       const data = await res.json();
 
       const grouped = {};
@@ -43,7 +43,7 @@ function AdminDebtlist() {
     };
 
     try {
-      const res = await fetch('http://localhost:8080/debts', {
+      const res = await fetch('http://192.168.0.112:8080/debts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newDebt),
@@ -81,7 +81,7 @@ function AdminDebtlist() {
     if (!clearConfirmation) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/debts/name/${name}`, { 
+      const res = await fetch(`http://192.168.0.112:8080/debts/name/${name}`, { 
         method: 'DELETE',
        });
       
@@ -126,7 +126,11 @@ function AdminDebtlist() {
               type="text" 
               placeholder="Item" 
               value={item}
-              onChange={(e) => setItem(e.target.value)} 
+              onChange={(e) => { 
+                const value = e.target.value;
+                const capitalized = value.charAt(0).toUpperCase() + value.slice(1);
+                setItem(capitalized);
+              }} 
             />
 
             {/* Price */}

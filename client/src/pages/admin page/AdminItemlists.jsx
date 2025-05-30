@@ -17,7 +17,7 @@ function AdminItemlists() {
 
   async function fetchItems() {
     try {
-      const res = await fetch('http://localhost:8080/items');
+      const res = await fetch('http://192.168.0.112:8080/items');
       const data = await res.json();
 
       // Group items by category
@@ -37,7 +37,7 @@ function AdminItemlists() {
     if (!category || !item || !price) return;
 
     try {
-      const res = await fetch('http://localhost:8080/items', {
+      const res = await fetch('http://192.168.0.112:8080/items', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ category, name: item, price: parseFloat(price) }),
@@ -69,7 +69,7 @@ function AdminItemlists() {
     if (selectedIndex === null || !category || !item || !price || !selectedItemId) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/items/${selectedItemId}`, {
+      const res = await fetch(`http://192.168.0.112:8080/items/${selectedItemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: item, price: parseFloat(price) }),
@@ -108,7 +108,7 @@ function AdminItemlists() {
     if (!itemToDelete?._id) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/items/${itemToDelete._id}`, {
+      const res = await fetch(`http://192.168.0.112:8080/items/${itemToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -136,6 +136,7 @@ function AdminItemlists() {
       console.error(error);
       setMessage('Failed to delete item');
     }
+
   };
 
   return (
@@ -156,7 +157,11 @@ function AdminItemlists() {
               placeholder="Item Name"
               required
               value={item}
-              onChange={(e) => setItem(e.target.value)}
+              onChange={(e) => { 
+                const value = e.target.value;
+                const capitalized = value.charAt(0).toUpperCase() + value.slice(1);
+                setItem(capitalized);
+              }}
             />
 
             <input
