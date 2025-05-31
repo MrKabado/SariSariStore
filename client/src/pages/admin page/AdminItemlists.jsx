@@ -140,7 +140,7 @@ function AdminItemlists() {
   };
 
   return (
-    <div className="border m-0">
+    <div className="global-holder border m-0">
       <header className="border p-2 sticky">
         <div className="AddItem">
           <form onSubmit={handleSubmit}>
@@ -172,22 +172,23 @@ function AdminItemlists() {
               onChange={(e) => setPrice(e.target.value)}
             />
 
-            <button type="submit">Add</button>
-            <button type="button" onClick={handleUpdate} disabled={selectedIndex === null}>
+            <button type="submit" className='btn'>Add</button>
+            <button type="button" className='btn' onClick={handleUpdate} disabled={selectedIndex === null}>
               Update
             </button>
           </form>
+          <Button to="/admin" label="Return To Admin Page" classname='btn'/>
         </div>
         <br />
-        <p>{message}</p>
+        <p className='text-green-500'>{message}</p>
       </header>
 
-      <div className="border m-auto w-[50%]">
-        <h2>Items</h2>
+      <div className="admin-list-holder border m-auto w-[50%]">
+        <h2 className=''>ITEMS</h2>
         {Object.entries(groupItems).map(([categoryName, items]) => (
           <div key={categoryName} className="flex flex-col justify-center">
             <h3 className="font-extrabold">{categoryName}</h3>
-            <table>
+            <table className=''>
               <thead>
                 <tr>
                   <th>Item Name</th>
@@ -228,8 +229,6 @@ function AdminItemlists() {
           </div>
         ))}
       </div>
-
-      <Button to="/admin" label="Return To Admin Page" />
     </div>
   );
 }

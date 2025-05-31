@@ -103,7 +103,7 @@ function AdminDebtlist() {
   };
 
   return (
-    <div>
+    <div className='global-holder'>
       <header className='border p-2'>
         <div className='AddDebt'>
           <form onSubmit={handleSubmit}>
@@ -142,37 +142,38 @@ function AdminDebtlist() {
             />
 
             {/* Add Button */}
-            <button type='submit'>Add</button>
+            <button className='btn' type='submit'>Add</button>
           </form>
+          <Button classname='btn' to='/admin' label='Return To Admin Page' />
         </div>
       </header>
 
-      <div className='border m-auto w-[50%]'>
+      <div className='debt-holder m-auto w-[50%]'>
         <h1>Debt</h1>
         <div>{message}</div>
         {Object.entries(groupItems).map(([name, categories]) => (
           <div key={name} className='flex flex-col justify-center'>
             <h2 className='font-extrabold'>{name}</h2>
 
-            <button onClick={() => handleClearDebt(name)} className='inline-block'>
+            <button onClick={() => handleClearDebt(name)} className='btn inline-block'>
               Clear Debt
             </button>
 
             {Object.entries(categories).map(([categoryName, items]) => (
-              <div key={categoryName}>
+              <div className='debt-item-holder' key={categoryName}>
                 <h3>{categoryName}</h3>
-                <table>
+                <table className='debt-item-table'>
                   <thead>
                     <tr>
                       <th>Item</th>
-                      <th>Price</th>
+                      <th className='debt-item-price'>Price</th>
                     </tr>
                   </thead>
                   <tbody>
                     {items.map((itemObj, index) => (
                       <tr key={index}>
                         <td>{itemObj.item}</td>
-                        <td>{itemObj.price.toFixed(2)}</td>
+                        <td className='debt-item-price'> ₱{itemObj.price.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -182,8 +183,6 @@ function AdminDebtlist() {
           </div>
         ))}
       </div>
-
-      <Button to='/admin' label='Return To Admin Page' />
     </div>
   );
 }

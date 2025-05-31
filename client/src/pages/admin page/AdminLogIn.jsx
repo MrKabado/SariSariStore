@@ -1,6 +1,5 @@
 import React from 'react';
 import { useState } from 'react';
-
 import Button from "../../components/Button";
 
 function AdminLogIn() {
@@ -21,32 +20,33 @@ function AdminLogIn() {
 
   return (
     <>
-      <div>
+      <div className='global-holder'>
         <form onSubmit={handleSubmit}>
+          <h1>LOG-IN AS ADMIN</h1>
           <div>
-            <label>Username: </label>
             <input 
               type="text"
               placeholder='username'
               value={username} 
               onChange={(e) => setUsername(e.target.value)}
+              required
             />
           </div>
           
           <div>
-            <label>Password: </label>
             <input 
               type="password" 
               placeholder='password'       
               value={password}
               onChange={(e) => {setPassword(e.target.value)}}   
+              required
             />
           </div>
           
-          <Button btnType="submit" label="Submit"/>
-          <Button to='/' label="Return"/>
+          <Button classname='btn' btnType="submit" label="Submit"/>
+          <Button classname='btn' to='/' label="Return"/>
         </form>
-        <p>{message}</p>
+        <p className='text-red-500'>{message}</p>
       </div>
     </>
   ) 

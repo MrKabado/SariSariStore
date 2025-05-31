@@ -3,16 +3,18 @@ import Button from "../components/Button";
 
 function Homepage() {
   return(
-      <div>       
-        <h1 className="font-">WELCOME TO JENNY SARI-SARI STORE</h1>
+      <div className="global-holder">       
+        <h1 className="">WELCOME TO JENNY SARI-SARI STORE</h1>
         <Button 
           to='/client' 
           label='Proceed as Customer'
+          classname='btn'
           />
 
         <Button 
           to='/admin/login'
           label='Proceed as Admin'
+          classname='btn'
         />
       </div>
   )
