@@ -145,11 +145,16 @@ function AdminItemlists() {
         <div className="AddItem">
           <form onSubmit={handleSubmit}>
             <select value={category} onChange={(e) => setCategory(e.target.value)} required>
-              <option value="" disabled>
-                Select
-              </option>
+            <option value="" disabled>Select Item</option>
               <option value="Soap">Soap</option>
               <option value="Shampoo">Shampoo</option>
+              <option value="Soap Panlaba">Soap-pablaba</option>
+              <option value="Dishwashing">Diswashing</option>
+              <option value="Cigarretes">Cigarretes</option>
+              <option value="Softdrinks">Softdrinks</option>
+              <option value="Canned Goods">Canned Goods</option>
+              <option value="Noodles">Noodles</option>
+              <option value="UNKNOWN">WAKO KIBAW</option>
             </select>
 
             <input

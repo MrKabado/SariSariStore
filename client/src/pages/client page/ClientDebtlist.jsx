@@ -5,7 +5,7 @@ function ClientDebtlist() {
   const [groupedDebts, setGroupedDebts] = useState({});
 
   useEffect(() => {
-    fetch('http://localhost:8080/debts')
+    fetch('http://192.168.0.112:8080/debts')
       .then(res => res.json())
       .then(data => {
         const grouped = {};

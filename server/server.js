@@ -34,7 +34,7 @@ const Debt = mongoose.model('Debt', DebtSchema);
 
 
 //GET
-app.get('/items', async (req, res) => {
+app.get('/items', async (req, res) => { //KUHA DATA GIKAN SA DATABASE
     try {
         const items = await Item.find();
         res.json(items);
@@ -54,7 +54,7 @@ app.get('/debts', async (req, res) => {
 
 
 //POST
-app.post('/items', async (req, res) => {
+app.post('/items', async (req, res) => { //SEND DATA SA DATABASE
     const {category, name, price} = req.body;
 
     try {
@@ -80,7 +80,8 @@ app.post('/debts', async (req, res) => {
 
 
 //PUT
-app.put('/items/:id', async (req, res) => {
+app.put('/items/:id', async (req, res) => { //MAG UPDATE OG DATA SA DATABASE
+
     const { id } = req.params;
     const { name, price } = req.body;
 
@@ -114,7 +115,7 @@ app.put('/debts/:id', async (req, res) => {
 
 
 //DELETE
-app.delete('/items/:id', async (req, res) => {
+app.delete('/items/:id', async (req, res) => { //DELETE DATA FROM DATABASE
     const { id } = req.params;
 
     try {
