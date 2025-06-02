@@ -112,6 +112,7 @@ function AdminDebtlist() {
               <option value="" disabled>Select Person</option>
               <option value="Jers">Jers</option>
               <option value="Maricar">Maricar</option>
+              <option value="Sung Joo Hun">Sung Joo Hun</option>
             </select>
 
             {/* Item Category */}
